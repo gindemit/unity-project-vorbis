@@ -10,7 +10,6 @@ public class PluginTest : MonoBehaviour
     [SerializeField] private AudioSource _loadedAudio;
     [Header("Internal references")]
     [SerializeField] private TMP_InputField _fileNameInputField;
-    [SerializeField] private TMP_InputField _channelsCountInputField;
     [SerializeField] private TextMeshProUGUI _finalFilePathOggText;
     [SerializeField] private TextMeshProUGUI _finalFilePathWavText;
     [SerializeField] private TextMeshProUGUI _sourceAudioStats;
@@ -41,7 +40,6 @@ public class PluginTest : MonoBehaviour
         Debug.Log(_workingDirectory);
         Directory.CreateDirectory(_workingDirectory);
         _fileNameInputField.text = _sourceAudio.clip.name;
-        _channelsCountInputField.text = _sourceAudio.clip.channels.ToString();
 
         UpdateFinalPaths();
         UpdateSourceAudioStats();
@@ -83,8 +81,7 @@ public class PluginTest : MonoBehaviour
     private void OnSaveOggButtonClick()
     {
         _stopwatch.Restart();
-        int channelsCount = int.Parse(_channelsCountInputField.text);
-        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip, channelsCount);
+        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip);
         _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
         Debug.Log($"Vorbis ogg file save took {_stopwatch.ElapsedMilliseconds} ms.");
     }

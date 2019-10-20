@@ -11,7 +11,7 @@ public static class VorbisPlugin
     [DllImport("VorbisPlugin")]
     private static extern int FreeSamplesArrayNativeMemory(ref System.IntPtr samples);
 
-    public static void Save(string filePath, UnityEngine.AudioClip audioClip, int channels = -1)
+    public static void Save(string filePath, UnityEngine.AudioClip audioClip)
     {
         if (string.IsNullOrWhiteSpace(filePath))
         {
@@ -21,7 +21,7 @@ public static class VorbisPlugin
         {
             throw new System.ArgumentNullException(nameof(audioClip));
         }
-        short finalChannelsCount = channels == -1 ? (short)audioClip.channels : (short)channels;
+        short finalChannelsCount = (short)audioClip.channels;
         if (finalChannelsCount != 1 && finalChannelsCount != 2)
         {
             throw new System.ArgumentException($"Only one or two channels are supported, provided channels count: {finalChannelsCount}");
@@ -51,6 +51,7 @@ public static class VorbisPlugin
         Marshal.Copy(pcmPtr, pcm, 0, pcmLength);
         FreeSamplesArrayNativeMemory(ref pcmPtr);
 
+        UnityEngine.Debug.Log($"{pcmLength}, {channels}, {frequency}");
         var audioClip = UnityEngine.AudioClip.Create("Test", pcmLength, channels, frequency, false);
         audioClip.SetData(pcm, 0);
 
