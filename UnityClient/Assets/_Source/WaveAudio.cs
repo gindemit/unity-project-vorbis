@@ -51,7 +51,6 @@ namespace Presentation.Utility.Loader
             {
                 filepath += ".wav";
             }
-            // Make sure directory exists if user is saving to sub dir.
             Directory.CreateDirectory(Path.GetDirectoryName(filepath));
 
             using (FileStream fileStream = new FileStream(filepath, FileMode.Create))

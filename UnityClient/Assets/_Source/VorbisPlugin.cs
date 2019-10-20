@@ -11,7 +11,7 @@ public static class VorbisPlugin
     [DllImport("VorbisPlugin")]
     private static extern int FreeSamplesArrayNativeMemory(ref System.IntPtr samples);
 
-    public static void Save(string filePath, UnityEngine.AudioClip audioClip)
+    public static void Save(string filePath, UnityEngine.AudioClip audioClip, int channels = -1)
     {
         if (string.IsNullOrWhiteSpace(filePath))
         {
@@ -21,6 +21,11 @@ public static class VorbisPlugin
         {
             throw new System.ArgumentNullException(nameof(audioClip));
         }
+        short finalChannelsCount = channels == -1 ? (short)audioClip.channels : (short)channels;
+        if (finalChannelsCount != 1 && finalChannelsCount != 2)
+        {
+            throw new System.ArgumentException($"Only one or two channels are supported, provided channels count: {finalChannelsCount}");
+        }
         if (!filePath.EndsWith(".ogg"))
         {
             filePath += ".ogg";
@@ -28,7 +33,7 @@ public static class VorbisPlugin
 
         float[] pcm = new float[audioClip.samples * audioClip.channels];
         audioClip.GetData(pcm, 0);
-        EncodePcmDataToFile(filePath, pcm, pcm.Length, (short)audioClip.channels, audioClip.frequency, 0.4f);
+        EncodePcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, 0.4f);
     }
 
     public static UnityEngine.AudioClip Load(string filePath)
