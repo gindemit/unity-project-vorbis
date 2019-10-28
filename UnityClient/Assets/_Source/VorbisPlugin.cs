@@ -21,6 +21,10 @@ public static class VorbisPlugin
         {
             throw new System.ArgumentNullException(nameof(audioClip));
         }
+        if (samplesToRead <= 0)
+        {
+            throw new System.ArgumentOutOfRangeException(nameof(samplesToRead));
+        }
         short finalChannelsCount = (short)audioClip.channels;
         if (finalChannelsCount != 1 && finalChannelsCount != 2)
         {
@@ -41,6 +45,10 @@ public static class VorbisPlugin
         if (string.IsNullOrWhiteSpace(filePath))
         {
             throw new System.ArgumentException("The file path is null or white space");
+        }
+        if (maxSamplesToRead <= 0)
+        {
+            throw new System.ArgumentOutOfRangeException(nameof(maxSamplesToRead));
         }
         if (!System.IO.File.Exists(filePath))
         {
