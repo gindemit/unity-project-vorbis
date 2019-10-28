@@ -25,6 +25,8 @@ public class PluginTest : MonoBehaviour
     [SerializeField] private Button _playPauseLoadedButton;
     [SerializeField] private TextMeshProUGUI _playPauseLoadedButtonText;
 
+    [SerializeField] private int _samplesToRead = 2048;
+
     private System.Diagnostics.Stopwatch _stopwatch;
     private string _workingDirectory;
 
@@ -81,7 +83,7 @@ public class PluginTest : MonoBehaviour
     private void OnSaveOggButtonClick()
     {
         _stopwatch.Restart();
-        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip);
+        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip, _samplesToRead);
         _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
         Debug.Log($"Vorbis ogg file save took {_stopwatch.ElapsedMilliseconds} ms.");
     }
@@ -97,7 +99,7 @@ public class PluginTest : MonoBehaviour
     private void OnLoadOggButtonClick()
     {
         _stopwatch.Restart();
-        _loadedAudio.clip = VorbisPlugin.Load(_finalFilePathOggText.text);
+        _loadedAudio.clip = VorbisPlugin.Load(_finalFilePathOggText.text, _samplesToRead);
         _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
         Debug.Log($"Load vorbis ogg file took {_stopwatch.ElapsedMilliseconds} ms.");
         UpdateLoadedAudioStats("ogg");

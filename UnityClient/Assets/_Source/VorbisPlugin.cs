@@ -11,7 +11,7 @@ public static class VorbisPlugin
     [DllImport("VorbisPlugin")]
     private static extern int FreeSamplesArrayNativeMemory(ref System.IntPtr samples);
 
-    public static void Save(string filePath, UnityEngine.AudioClip audioClip)
+    public static void Save(string filePath, UnityEngine.AudioClip audioClip, int samplesToRead = 1024)
     {
         if (string.IsNullOrWhiteSpace(filePath))
         {
@@ -33,10 +33,10 @@ public static class VorbisPlugin
 
         float[] pcm = new float[audioClip.samples * audioClip.channels];
         audioClip.GetData(pcm, 0);
-        WriteAllPcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, 0.4f, 1024);
+        WriteAllPcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, 0.4f, samplesToRead);
     }
 
-    public static UnityEngine.AudioClip Load(string filePath)
+    public static UnityEngine.AudioClip Load(string filePath, int maxSamplesToRead = 1024)
     {
         if (string.IsNullOrWhiteSpace(filePath))
         {
@@ -46,7 +46,7 @@ public static class VorbisPlugin
         {
             throw new System.IO.FileNotFoundException();
         }
-        ReadAllPcmDataFromFile(filePath, out System.IntPtr pcmPtr, out int pcmLength, out short channels, out int frequency, 1024);
+        ReadAllPcmDataFromFile(filePath, out System.IntPtr pcmPtr, out int pcmLength, out short channels, out int frequency, maxSamplesToRead);
         float[] pcm = new float[pcmLength];
         Marshal.Copy(pcmPtr, pcm, 0, pcmLength);
         FreeSamplesArrayNativeMemory(ref pcmPtr);
