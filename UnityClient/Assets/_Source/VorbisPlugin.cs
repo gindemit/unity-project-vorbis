@@ -2,14 +2,23 @@
 
 public static class VorbisPlugin
 {
-    [DllImport("VorbisPlugin")]
+    private const string PLUGIN_NAME = "VorbisPlugin";
+
+    [DllImport(PLUGIN_NAME)]
     private static extern int WriteAllPcmDataToFile(string filePath, float[] samples, int samplesLength, short channels, int frequency, float base_quality, int samplesToRead);
 
-    [DllImport("VorbisPlugin")]
+    [DllImport(PLUGIN_NAME)]
     private static extern int ReadAllPcmDataFromFile(string filePath, out System.IntPtr samples, out int samplesLength, out short channels, out int frequency, int maxSamplesToRead);
-
-    [DllImport("VorbisPlugin")]
+    [DllImport(PLUGIN_NAME)]
     private static extern int FreeSamplesArrayNativeMemory(ref System.IntPtr samples);
+
+    [DllImport(PLUGIN_NAME)]
+    private static extern System.IntPtr OpenReadFileStream(string filePath, out short channels, out int frequency);
+    [DllImport(PLUGIN_NAME)]
+    private static extern int ReadFromFileStream(System.IntPtr state, float[] samplesToFill, int maxSamplesToRead);
+    [DllImport(PLUGIN_NAME)]
+    private static extern int CloseFileStream(System.IntPtr state);
+
 
     public static void Save(string filePath, UnityEngine.AudioClip audioClip, int samplesToRead = 1024)
     {
