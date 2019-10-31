@@ -13,11 +13,11 @@ public static class VorbisPlugin
     private static extern int FreeSamplesArrayNativeMemory(ref System.IntPtr samples);
 
     [DllImport(PLUGIN_NAME)]
-    private static extern System.IntPtr OpenReadFileStream(string filePath, out short channels, out int frequency);
+    public static extern System.IntPtr OpenReadFileStream(string filePath, out short channels, out int frequency);
     [DllImport(PLUGIN_NAME)]
-    private static extern int ReadFromFileStream(System.IntPtr state, float[] samplesToFill, int maxSamplesToRead);
+    public static extern int ReadFromFileStream(System.IntPtr state, float[] samplesToFill, int maxSamplesToRead);
     [DllImport(PLUGIN_NAME)]
-    private static extern int CloseFileStream(System.IntPtr state);
+    public static extern int CloseFileStream(System.IntPtr state);
 
 
     public static void Save(string filePath, UnityEngine.AudioClip audioClip, int samplesToRead = 1024)
