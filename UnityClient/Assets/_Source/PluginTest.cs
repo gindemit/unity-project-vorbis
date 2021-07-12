@@ -11,14 +11,11 @@ public class PluginTest : MonoBehaviour
     [Header("Internal references")]
     [SerializeField] private TMP_InputField _fileNameInputField;
     [SerializeField] private TextMeshProUGUI _finalFilePathOggText;
-    [SerializeField] private TextMeshProUGUI _finalFilePathWavText;
     [SerializeField] private TextMeshProUGUI _sourceAudioStats;
     [SerializeField] private TextMeshProUGUI _loadedAudioStats;
     [SerializeField] private TextMeshProUGUI _tookText;
     [SerializeField] private Button _saveOggButton;
-    [SerializeField] private Button _saveWavButton;
     [SerializeField] private Button _loadOggButton;
-    [SerializeField] private Button _loadWavButton;
 
     [SerializeField] private Button _playPauseSourceButton;
     [SerializeField] private TextMeshProUGUI _playPauseSourceButtonText;
@@ -52,9 +49,7 @@ public class PluginTest : MonoBehaviour
     {
         _fileNameInputField.onValueChanged.AddListener(OnFileNameInputFieldValueChanged);
         _saveOggButton.onClick.AddListener(OnSaveOggButtonClick);
-        _saveWavButton.onClick.AddListener(OnSaveWavButtonClick);
         _loadOggButton.onClick.AddListener(OnLoadOggButtonClick);
-        _loadWavButton.onClick.AddListener(OnLoadWavButtonClick);
         _playPauseSourceButton.onClick.AddListener(OnPlayPauseSourceButtonClick);
         _playPauseLoadedButton.onClick.AddListener(OnPlayPauseLoadedButtonClick);
     }
@@ -62,9 +57,7 @@ public class PluginTest : MonoBehaviour
     {
         _fileNameInputField.onValueChanged.RemoveListener(OnFileNameInputFieldValueChanged);
         _saveOggButton.onClick.RemoveListener(OnSaveOggButtonClick);
-        _saveWavButton.onClick.RemoveListener(OnSaveWavButtonClick);
         _loadOggButton.onClick.RemoveListener(OnLoadOggButtonClick);
-        _loadWavButton.onClick.RemoveListener(OnLoadWavButtonClick);
         _playPauseSourceButton.onClick.RemoveListener(OnPlayPauseSourceButtonClick);
         _playPauseLoadedButton.onClick.RemoveListener(OnPlayPauseLoadedButtonClick);
     }
@@ -73,28 +66,12 @@ public class PluginTest : MonoBehaviour
     {
         UpdateFinalPaths();
     }
-    private void OnSaveWavButtonClick()
-    {
-        _stopwatch.Restart();
-        Presentation.Utility.Loader.WaveAudio.Save(_finalFilePathWavText.text, _sourceAudio.clip);
-        _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
-        Debug.Log($"Wave file save took {_stopwatch.ElapsedMilliseconds} ms.");
-    }
     private void OnSaveOggButtonClick()
     {
         _stopwatch.Restart();
         VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip, _samplesToRead);
         _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
         Debug.Log($"Vorbis ogg file save took {_stopwatch.ElapsedMilliseconds} ms.");
-    }
-    private void OnLoadWavButtonClick()
-    {
-        _stopwatch.Restart();
-        byte[] wavBytes = File.ReadAllBytes(_finalFilePathWavText.text);
-        _loadedAudio.clip = Presentation.Utility.Loader.WaveAudio.ToAudioClip(wavBytes);
-        _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
-        Debug.Log($"Load wave file took {_stopwatch.ElapsedMilliseconds} ms.");
-        UpdateLoadedAudioStats("wav");
     }
     private void OnLoadOggButtonClick()
     {
@@ -135,7 +112,6 @@ public class PluginTest : MonoBehaviour
         string fileName = _fileNameInputField.text;
         string pathToSave = Path.Combine(_workingDirectory, fileName);
         _finalFilePathOggText.text = pathToSave + ".ogg";
-        _finalFilePathWavText.text = pathToSave + ".wav";
     }
     private void UpdateSourceAudioStats()
     {
