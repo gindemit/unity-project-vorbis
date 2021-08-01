@@ -2,7 +2,11 @@
 
 public static class VorbisPlugin
 {
+#if UNITY_IOS && !UNITY_EDITOR
+    private const string PLUGIN_NAME = "__Internal";
+#else
     private const string PLUGIN_NAME = "VorbisPlugin";
+#endif
 
     [DllImport(PLUGIN_NAME)]
     private static extern int WriteAllPcmDataToFile(string filePath, float[] samples, int samplesLength, short channels, int frequency, float base_quality, int samplesToRead);
