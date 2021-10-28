@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.IO;
+using System.Runtime.InteropServices;
 
 public static class VorbisPlugin
 {
@@ -8,20 +9,63 @@ public static class VorbisPlugin
     private const string PLUGIN_NAME = "VorbisPlugin";
 #endif
 
-    [DllImport(PLUGIN_NAME)]
-    private static extern int WriteAllPcmDataToFile(string filePath, float[] samples, int samplesLength, short channels, int frequency, float base_quality, int samplesToRead);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "WriteAllPcmDataToFile")]
+    private static extern int WriteAllPcmDataToFile(
+        string filePath,
+        float[] samples,
+        int samplesLength,
+        short channels,
+        int frequency,
+        float base_quality,
+        int samplesToRead);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "WriteAllPcmDataToMemory")]
+    private static extern int WriteAllPcmDataToMemory(
+        out System.IntPtr bytesPtr,
+        out int bytesLength,
+        float[] samples,
+        int samplesLength,
+        short channels,
+        int frequency,
+        float base_quality,
+        int samplesToRead);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "FreeMemoryArrayForWriteAllPcmData")]
+    private static extern int FreeMemoryArrayForWriteAllPcmData(
+        System.IntPtr bytesNativeArray);
 
-    [DllImport(PLUGIN_NAME)]
-    private static extern int ReadAllPcmDataFromFile(string filePath, out System.IntPtr samples, out int samplesLength, out short channels, out int frequency, int maxSamplesToRead);
-    [DllImport(PLUGIN_NAME)]
-    private static extern int FreeSamplesArrayNativeMemory(ref System.IntPtr samples);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ReadAllPcmDataFromFile")]
+    private static extern int ReadAllPcmDataFromFile(
+        string filePath,
+        out System.IntPtr samples,
+        out int samplesLength,
+        out short channels,
+        out int frequency,
+        int maxSamplesToRead);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ReadAllPcmDataFromMemory")]
+    private static extern int ReadAllPcmDataFromMemory(
+        byte[] memoryArray,
+        int memoryArrayLength,
+        out System.IntPtr samples,
+        out int samplesLength,
+        out short channels,
+        out int frequency,
+        int maxSamplesToRead);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "FreeSamplesArrayNativeMemory")]
+    private static extern int FreeSamplesArrayNativeMemory(
+        ref System.IntPtr samples);
 
-    [DllImport(PLUGIN_NAME)]
-    public static extern System.IntPtr OpenReadFileStream(string filePath, out short channels, out int frequency);
-    [DllImport(PLUGIN_NAME)]
-    public static extern int ReadFromFileStream(System.IntPtr state, float[] samplesToFill, int maxSamplesToRead);
-    [DllImport(PLUGIN_NAME)]
-    public static extern int CloseFileStream(System.IntPtr state);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "OpenReadFileStream")]
+    public static extern System.IntPtr OpenReadFileStream(
+        string filePath,
+        out short channels,
+        out int frequency);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ReadFromFileStream")]
+    public static extern int ReadFromFileStream(
+        System.IntPtr state,
+        float[] samplesToFill,
+        int maxSamplesToRead);
+    [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "CloseFileStream")]
+    public static extern int CloseFileStream(
+        System.IntPtr state);
 
 
     public static void Save(string filePath, UnityEngine.AudioClip audioClip, int samplesToRead = 1024)
