@@ -6,6 +6,11 @@ using UnityEngine.TestTools;
 
 public class OggFileWriteReadTest
 {
+    private const string SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_48000HZ = "Audio/vivaldi-summer-the-four-seasons";
+    private const string SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_48000HZ = "Audio/vivaldi-summer-the-four-seasons_mono";
+    private const string SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_44100HZ = "Audio/Kai_Engel_-_07_-_Interception";
+    private const string SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_44100HZ = "Audio/Kai_Engel_-_07_-_Interception_mono";
+
     private AudioClip _stereoFile3Minutes48000Hz;
     private AudioClip _monoFile3Minutes48000Hz;
     private AudioClip _stereoFile2Minutes44100Hz;
@@ -16,10 +21,10 @@ public class OggFileWriteReadTest
     [SetUp]
     public void SetUp()
     {
-        _stereoFile3Minutes48000Hz = Resources.Load<AudioClip>("Audio/vivaldi-summer-the-four-seasons");
-        _monoFile3Minutes48000Hz = Resources.Load<AudioClip>("Audio/vivaldi-summer-the-four-seasons_mono");
-        _stereoFile2Minutes44100Hz = Resources.Load<AudioClip>("Audio/Kai_Engel_-_07_-_Interception");
-        _monoFile2Minutes44100Hz = Resources.Load<AudioClip>("Audio/Kai_Engel_-_07_-_Interception_mono");
+        _stereoFile3Minutes48000Hz = Resources.Load<AudioClip>(SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_48000HZ);
+        _monoFile3Minutes48000Hz = Resources.Load<AudioClip>(SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_48000HZ);
+        _stereoFile2Minutes44100Hz = Resources.Load<AudioClip>(SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_44100HZ);
+        _monoFile2Minutes44100Hz = Resources.Load<AudioClip>(SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_44100HZ);
 
         _filesFolder = Path.Combine(Application.persistentDataPath, "VorbisTestFiles");
         Directory.CreateDirectory(_filesFolder);
@@ -58,35 +63,39 @@ public class OggFileWriteReadTest
         var fileInfo = new FileInfo(pathToFile);
         Assert.IsTrue(fileInfo.Length > 1000);
     }
-    [Test]
-    public void TheVorbisPluginSavesAndLoadsStereo48000HzFile()
+    [TestCase(SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_48000HZ)]
+    [TestCase(SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_48000HZ)]
+    [TestCase(SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_44100HZ)]
+    [TestCase(SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_44100HZ)]
+    public void TheVorbisPluginSavesAndLoadsStereo48000HzFile(string sourceAudioClipPath)
     {
-        string pathToFile = Path.Combine(_filesFolder, _stereoFile3Minutes48000Hz.name) + ".ogg";
-        OggVorbis.VorbisPlugin.Save(pathToFile, _stereoFile3Minutes48000Hz);
+        AudioClip sourceAudioClip = Resources.Load<AudioClip>(sourceAudioClipPath);
+        string pathToFile = Path.Combine(_filesFolder, sourceAudioClip.name) + ".ogg";
+        OggVorbis.VorbisPlugin.Save(pathToFile, sourceAudioClip);
         AudioClip audioClip = OggVorbis.VorbisPlugin.Load(pathToFile);
-        OggVorbis.VorbisPlugin.Save(Path.Combine(_filesFolder, _stereoFile3Minutes48000Hz.name) + "_1.ogg", audioClip);
+        OggVorbis.VorbisPlugin.Save(Path.Combine(_filesFolder, sourceAudioClip.name) + "_1.ogg", audioClip);
 
-        Assert.AreEqual(_stereoFile3Minutes48000Hz.channels, audioClip.channels);
-        Assert.AreEqual(_stereoFile3Minutes48000Hz.frequency, audioClip.frequency);
+        Assert.AreEqual(sourceAudioClip.channels, audioClip.channels);
+        Assert.AreEqual(sourceAudioClip.frequency, audioClip.frequency);
 
         // Tested on Win 10 Unity 2021.1.2f1 version:
-        // 128 delta is added because Unity _stereoFile3Minutes48000Hz.samples returns
-        // an array that is 128 samples smaller in size that the original file contains
-        // The _stereoFile3Minutes48000Hz source file in Unity project is an mp3 file
+        // 384 delta is added because Unity SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_44100HZ.samples returns
+        // an array that is 384 samples smaller in size that the original file contains
+        // The sourceAudioClip source file in Unity project is an mp3 file
         // The Audacity returns:
-        //      9 362 304 samples for the original mp3 file from Unity Assets folder
-        //      9 362 432 samples for the first stored ogg file
-        //      9 362 432 samples for the ogg file that is stored from the loaded first ogg file
-        Assert.AreEqual(_stereoFile3Minutes48000Hz.samples, audioClip.samples, 128);
+        //      6 325 632 samples for the original mp3 file from Unity Assets folder
+        //      6 326 016 samples for the first stored ogg file
+        //      6 326 272 samples for the ogg file that is stored from the loaded first ogg file
+        Assert.AreEqual(sourceAudioClip.samples, audioClip.samples, 384);
         // And the length of the files differs little bit
-        Assert.AreEqual(_stereoFile3Minutes48000Hz.length, audioClip.length, 0.1);
+        Assert.AreEqual(sourceAudioClip.length, audioClip.length, 0.1);
 
-        float[] samplesFromResourcesFile = new float[_stereoFile3Minutes48000Hz.samples];
-        Assert.IsTrue(_stereoFile3Minutes48000Hz.GetData(samplesFromResourcesFile, 0));
+        float[] samplesFromResourcesFile = new float[sourceAudioClip.samples];
+        Assert.IsTrue(sourceAudioClip.GetData(samplesFromResourcesFile, 0));
         float[] samplesFromLoadedOggFile = new float[audioClip.samples];
         Assert.IsTrue(audioClip.GetData(samplesFromLoadedOggFile, 0));
 
-        int length = Mathf.Min(_stereoFile3Minutes48000Hz.samples, audioClip.samples);
+        int length = Mathf.Min(sourceAudioClip.samples, audioClip.samples);
         for (int i = 0; i < length; ++i)
         {
             Assert.AreEqual(samplesFromResourcesFile[i], samplesFromLoadedOggFile[i], 0.2, "Wrong sample value at " + i);
