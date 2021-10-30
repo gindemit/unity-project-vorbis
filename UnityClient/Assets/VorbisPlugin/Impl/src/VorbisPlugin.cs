@@ -10,7 +10,9 @@ namespace OggVorbis
         private const string PLUGIN_NAME = "VorbisPlugin";
 #endif
 
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "write_all_pcm_data_to_file")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "write_all_pcm_data_to_file")]
         private static extern int WriteAllPcmDataToFile(
             string filePath,
             float[] samples,
@@ -19,7 +21,9 @@ namespace OggVorbis
             int frequency,
             float base_quality,
             int samplesToRead);
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "write_all_pcm_data_to_memory")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "write_all_pcm_data_to_memory")]
         private static extern int WriteAllPcmDataToMemory(
             out System.IntPtr bytesPtr,
             out int bytesLength,
@@ -29,11 +33,15 @@ namespace OggVorbis
             int frequency,
             float base_quality,
             int samplesToRead);
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "free_memory_array_for_write_all_pcm_data")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "free_memory_array_for_write_all_pcm_data")]
         private static extern int FreeMemoryArrayForWriteAllPcmData(
             System.IntPtr bytesNativeArray);
 
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "read_all_pcm_data_from_file")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "read_all_pcm_data_from_file")]
         private static extern int ReadAllPcmDataFromFile(
             string filePath,
             out System.IntPtr samples,
@@ -41,7 +49,9 @@ namespace OggVorbis
             out short channels,
             out int frequency,
             int maxSamplesToRead);
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "read_all_pcm_data_from_memory")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "read_all_pcm_data_from_memory")]
         private static extern int ReadAllPcmDataFromMemory(
             byte[] memoryArray,
             int memoryArrayLength,
@@ -50,26 +60,38 @@ namespace OggVorbis
             out short channels,
             out int frequency,
             int maxSamplesToRead);
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "free_samples_array_native_memory")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "free_samples_array_native_memory")]
         private static extern int FreeSamplesArrayNativeMemory(
             ref System.IntPtr samples);
 
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "open_read_file_stream")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "open_read_file_stream")]
         public static extern System.IntPtr OpenReadFileStream(
             string filePath,
             out short channels,
             out int frequency);
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "read_from_file_stream")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "read_from_file_stream")]
         public static extern int ReadFromFileStream(
             System.IntPtr state,
             float[] samplesToFill,
             int maxSamplesToRead);
-        [DllImport(PLUGIN_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "close_file_stream")]
+        [DllImport(PLUGIN_NAME,
+            CallingConvention = CallingConvention.Cdecl,
+            EntryPoint = "close_file_stream")]
         public static extern int CloseFileStream(
             System.IntPtr state);
 
 
-        public static void Save(string filePath, UnityEngine.AudioClip audioClip, int samplesToRead = 1024)
+        public static void Save(
+            string filePath,
+            UnityEngine.AudioClip audioClip,
+            float quality = 0.4f,
+            int samplesToRead = 1024)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -95,7 +117,7 @@ namespace OggVorbis
 
             float[] pcm = new float[audioClip.samples * audioClip.channels];
             audioClip.GetData(pcm, 0);
-            WriteAllPcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, 0.4f, samplesToRead);
+            WriteAllPcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, quality, samplesToRead);
         }
 
         public static UnityEngine.AudioClip Load(string filePath, int maxSamplesToRead = 1024)
@@ -118,7 +140,7 @@ namespace OggVorbis
             FreeSamplesArrayNativeMemory(ref pcmPtr);
 
             UnityEngine.Debug.Log($"{pcmLength}, {channels}, {frequency}");
-            var audioClip = UnityEngine.AudioClip.Create("Test", pcmLength, channels, frequency, false);
+            var audioClip = UnityEngine.AudioClip.Create(System.IO.Path.GetFileName(filePath), pcmLength / channels, channels, frequency, false);
             audioClip.SetData(pcm, 0);
 
             return audioClip;
