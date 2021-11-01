@@ -117,7 +117,8 @@ namespace OggVorbis
 
             float[] pcm = new float[audioClip.samples * audioClip.channels];
             audioClip.GetData(pcm, 0);
-            WriteAllPcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, quality, samplesToRead);
+            int returnCode = WriteAllPcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, quality, samplesToRead);
+            NativeErrorException.ThrowExceptionIfNecessary(returnCode);
         }
 
         public static UnityEngine.AudioClip Load(string filePath, int maxSamplesToRead = 1024)
@@ -134,12 +135,19 @@ namespace OggVorbis
             {
                 throw new System.IO.FileNotFoundException();
             }
-            ReadAllPcmDataFromFile(filePath, out System.IntPtr pcmPtr, out int pcmLength, out short channels, out int frequency, maxSamplesToRead);
+            int returnCode = ReadAllPcmDataFromFile(
+                filePath,
+                out System.IntPtr pcmPtr,
+                out int pcmLength,
+                out short channels,
+                out int frequency,
+                maxSamplesToRead);
+            NativeErrorException.ThrowExceptionIfNecessary(returnCode);
             float[] pcm = new float[pcmLength];
             Marshal.Copy(pcmPtr, pcm, 0, pcmLength);
             FreeSamplesArrayNativeMemory(ref pcmPtr);
+            NativeErrorException.ThrowExceptionIfNecessary(returnCode);
 
-            UnityEngine.Debug.Log($"{pcmLength}, {channels}, {frequency}");
             var audioClip = UnityEngine.AudioClip.Create(System.IO.Path.GetFileName(filePath), pcmLength / channels, channels, frequency, false);
             audioClip.SetData(pcm, 0);
 
