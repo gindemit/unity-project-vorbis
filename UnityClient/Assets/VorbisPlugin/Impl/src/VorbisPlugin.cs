@@ -62,7 +62,7 @@ namespace OggVorbis
             NativeErrorException.ThrowExceptionIfNecessary(returnCode);
             float[] pcm = new float[pcmLength];
             Marshal.Copy(pcmPtr, pcm, 0, pcmLength);
-            NativeBridge.FreeSamplesArrayNativeMemory(ref pcmPtr);
+            returnCode = NativeBridge.FreeSamplesArrayNativeMemory(ref pcmPtr);
             NativeErrorException.ThrowExceptionIfNecessary(returnCode);
 
             var audioClip = UnityEngine.AudioClip.Create(System.IO.Path.GetFileName(filePath), pcmLength / channels, channels, frequency, false);
