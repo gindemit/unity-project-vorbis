@@ -37,6 +37,43 @@ namespace OggVorbis
             int returnCode = NativeBridge.WriteAllPcmDataToFile(filePath, pcm, pcm.Length, finalChannelsCount, audioClip.frequency, quality, samplesToRead);
             NativeErrorException.ThrowExceptionIfNecessary(returnCode);
         }
+        public static byte[] GetOggVorbis(
+            UnityEngine.AudioClip audioClip,
+            float quality = 0.4f,
+            int samplesToRead = 1024)
+        {
+            if (audioClip == null)
+            {
+                throw new System.ArgumentNullException(nameof(audioClip));
+            }
+            if (samplesToRead <= 0)
+            {
+                throw new System.ArgumentOutOfRangeException(nameof(samplesToRead));
+            }
+            short finalChannelsCount = (short)audioClip.channels;
+            if (finalChannelsCount != 1 && finalChannelsCount != 2)
+            {
+                throw new System.ArgumentException($"Only one or two channels are supported, provided channels count: {finalChannelsCount}");
+            }
+
+            float[] pcm = new float[audioClip.samples * audioClip.channels];
+            audioClip.GetData(pcm, 0);
+            int returnCode = NativeBridge.WriteAllPcmDataToMemory(
+                out System.IntPtr bytesPtr,
+                out int bytesLength,
+                pcm,
+                pcm.Length,
+                finalChannelsCount,
+                audioClip.frequency,
+                quality,
+                samplesToRead);
+            NativeErrorException.ThrowExceptionIfNecessary(returnCode);
+            byte[] bytes = new byte[bytesLength];
+            Marshal.Copy(bytesPtr, bytes, 0, bytesLength);
+            returnCode = NativeBridge.FreeMemoryArrayForWriteAllPcmData(bytesPtr);
+            NativeErrorException.ThrowExceptionIfNecessary(returnCode);
+            return bytes;
+        }
 
         public static UnityEngine.AudioClip Load(string filePath, int maxSamplesToRead = 1024)
         {
