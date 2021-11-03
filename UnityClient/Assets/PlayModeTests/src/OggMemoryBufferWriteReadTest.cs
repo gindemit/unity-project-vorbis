@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PlayModeTests
 {
-    public class OggFileWriteReadTest
+    public class OggMemoryBufferWriteReadTest
     {
         private string _filesFolder;
 
@@ -15,17 +15,16 @@ namespace PlayModeTests
             Directory.CreateDirectory(_filesFolder);
         }
 
-        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_48000HZ)]
-        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_48000HZ)]
-        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_44100HZ)]
-        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_44100HZ)]
-        public void SaveLoadAndSaveWork(string sourceAudioClipPath)
+        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_48000HZ + ".ogg")]
+        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_48000HZ + ".ogg")]
+        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_STEREO_44100HZ + ".ogg")]
+        [TestCase(Consts.SOURCE_AUDIO_CLIP_RESOURCES_PATH_MONO_44100HZ + ".ogg")]
+        public void ToAudioClipToBytesAndToAudioClipWork(string sourceAudioClipPath)
         {
-            AudioClip sourceAudioClip = Resources.Load<AudioClip>(sourceAudioClipPath);
-            string pathToFile = Path.Combine(_filesFolder, sourceAudioClip.name) + ".ogg";
-            OggVorbis.VorbisPlugin.Save(pathToFile, sourceAudioClip);
-            AudioClip audioClip = OggVorbis.VorbisPlugin.Load(pathToFile);
-            OggVorbis.VorbisPlugin.Save(Path.Combine(_filesFolder, sourceAudioClip.name) + "_1.ogg", audioClip);
+            byte[] sourceAudioBytes = Support.StreamingAssets.StreamingAssetsHelper.LoadFileFromStreamingAssets(sourceAudioClipPath);
+            AudioClip sourceAudioClip = OggVorbis.VorbisPlugin.ToAudioClip(sourceAudioBytes, "AudioClip");
+            byte[] bytes = OggVorbis.VorbisPlugin.GetOggVorbis(sourceAudioClip);
+            AudioClip audioClip = OggVorbis.VorbisPlugin.ToAudioClip(bytes, "AudioClip");
 
             Assert.AreEqual(sourceAudioClip.channels, audioClip.channels);
             Assert.AreEqual(sourceAudioClip.frequency, audioClip.frequency);
