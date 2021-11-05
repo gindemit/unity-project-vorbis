@@ -70,7 +70,7 @@ public class PluginTest : MonoBehaviour
     private void OnSaveOggButtonClick()
     {
         _stopwatch.Restart();
-        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip, _samplesToRead);
+        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip, 0.4f, _samplesToRead);
         _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
         Debug.Log($"Vorbis ogg file save took {_stopwatch.ElapsedMilliseconds} ms.");
     }
