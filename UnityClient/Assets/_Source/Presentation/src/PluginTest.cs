@@ -17,6 +17,8 @@ public class PluginTest : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _tookText;
     [SerializeField] private Button _saveOggButton;
     [SerializeField] private Button _loadOggButton;
+    [SerializeField] private Slider _baseQualitySlider;
+    [SerializeField] private TextMeshProUGUI _baseQualityValueText;
 
     [SerializeField] private Button _playPauseSourceButton;
     [SerializeField] private TextMeshProUGUI _playPauseSourceButtonText;
@@ -40,6 +42,7 @@ public class PluginTest : MonoBehaviour
         Debug.Log(_workingDirectory);
         Directory.CreateDirectory(_workingDirectory);
         _fileNameInputField.text = _sourceAudio.clip.name;
+        OnBaseQualitySliderValueChanged(_baseQualitySlider.value);
 
         UpdateFinalPaths();
         UpdateSourceAudioStats();
@@ -53,6 +56,7 @@ public class PluginTest : MonoBehaviour
         _loadOggButton.onClick.AddListener(OnLoadOggButtonClick);
         _playPauseSourceButton.onClick.AddListener(OnPlayPauseSourceButtonClick);
         _playPauseLoadedButton.onClick.AddListener(OnPlayPauseLoadedButtonClick);
+        _baseQualitySlider.onValueChanged.AddListener(OnBaseQualitySliderValueChanged);
     }
     private void OnDisable()
     {
@@ -61,6 +65,7 @@ public class PluginTest : MonoBehaviour
         _loadOggButton.onClick.RemoveListener(OnLoadOggButtonClick);
         _playPauseSourceButton.onClick.RemoveListener(OnPlayPauseSourceButtonClick);
         _playPauseLoadedButton.onClick.RemoveListener(OnPlayPauseLoadedButtonClick);
+        _baseQualitySlider.onValueChanged.RemoveListener(OnBaseQualitySliderValueChanged);
     }
 
     private void OnFileNameInputFieldValueChanged(string value)
@@ -128,5 +133,9 @@ public class PluginTest : MonoBehaviour
             return;
         }
         _loadedAudioStats.text = $"{clip.name}, {format}, {clip.length} sec., {clip.frequency} kHz, {clip.channels} ch.";
+    }
+    private void OnBaseQualitySliderValueChanged(float value)
+    {
+        _baseQualityValueText.text = value.ToString("0.00");
     }
 }
