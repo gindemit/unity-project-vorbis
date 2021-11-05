@@ -19,6 +19,7 @@ public class PluginTest : MonoBehaviour
     [SerializeField] private Button _loadOggButton;
     [SerializeField] private Slider _baseQualitySlider;
     [SerializeField] private TextMeshProUGUI _baseQualityValueText;
+    [SerializeField] private TextMeshProUGUI _fileSizeValueText;
 
     [SerializeField] private Button _playPauseSourceButton;
     [SerializeField] private TextMeshProUGUI _playPauseSourceButtonText;
@@ -75,8 +76,11 @@ public class PluginTest : MonoBehaviour
     private void OnSaveOggButtonClick()
     {
         _stopwatch.Restart();
-        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip, 0.4f, _samplesToRead);
+        VorbisPlugin.Save(_finalFilePathOggText.text, _sourceAudio.clip, _baseQualitySlider.value, _samplesToRead);
         _tookText.text = _stopwatch.ElapsedMilliseconds.ToString();
+        FileInfo fileInfo = new FileInfo(_finalFilePathOggText.text);
+        long fileSize = fileInfo.Length;
+        _fileSizeValueText.text = Support.ToStringHelpers.FIleSizeFormatter.ToPrettyFileSize(fileSize);
         Debug.Log($"Vorbis ogg file save took {_stopwatch.ElapsedMilliseconds} ms.");
     }
     private void OnLoadOggButtonClick()
