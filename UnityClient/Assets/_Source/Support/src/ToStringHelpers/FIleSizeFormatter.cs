@@ -6,14 +6,49 @@
 
         public static string ToPrettyFileSize(long fileSize)
         {
-            double len = fileSize;
-            int order = 0;
-            while (len >= 1024 && order < sSizes.Length - 1)
+            // Get absolute value
+            long absolute_i = (fileSize < 0 ? -fileSize : fileSize);
+            // Determine the suffix and readable value
+            string suffix;
+            double readable;
+            if (absolute_i >= 0x1000000000000000) // Exabyte
             {
-                order++;
-                len = len / 1024;
+                suffix = "EB";
+                readable = (fileSize >> 50);
             }
-            return string.Format("{0:0.##} {1}", len, sSizes[order]);
+            else if (absolute_i >= 0x4000000000000) // Petabyte
+            {
+                suffix = "PB";
+                readable = (fileSize >> 40);
+            }
+            else if (absolute_i >= 0x10000000000) // Terabyte
+            {
+                suffix = "TB";
+                readable = (fileSize >> 30);
+            }
+            else if (absolute_i >= 0x40000000) // Gigabyte
+            {
+                suffix = "GB";
+                readable = (fileSize >> 20);
+            }
+            else if (absolute_i >= 0x100000) // Megabyte
+            {
+                suffix = "MB";
+                readable = (fileSize >> 10);
+            }
+            else if (absolute_i >= 0x400) // Kilobyte
+            {
+                suffix = "KB";
+                readable = fileSize;
+            }
+            else
+            {
+                return fileSize.ToString("0 B"); // Byte
+            }
+            // Divide by 1024 to get fractional value
+            readable = (readable / 1024);
+            // Return formatted number with suffix
+            return readable.ToString("0.## ") + suffix;
         }
     }
 }
