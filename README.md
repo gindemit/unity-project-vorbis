@@ -1,6 +1,40 @@
 # Unity project Vorbis
-This is a Unity sample project that uses the [C wrapper around Vorbis libraries](https://github.com/khindemit/unity-vorbis) to save and load audio data in Vorbis format.
+This is a Unity sample project that uses the [VorbisPlugin](https://github.com/khindemit/unity-vorbis) to save and load audio data in Vorbis format.
 You can checkout this repository. The latest released binaries are inside Assets/VorbisPlugin/Plugins/ folder
+
+#### The latest releases you'll find in [VorbisPlugin](https://github.com/khindemit/unity-vorbis) repository
+
+# How to use
+### Load vorbis ogg from file at runtime:
+```
+string pathToFile = ...;
+UnityEngine.AudioClip audioClip = OggVorbis.VorbisPlugin.Load(pathToFile);
+```
+### Save vorbis ogg to file at runtime:
+```
+string pathToFile = ...;
+UnityEngine.AudioClip audioClip = ...;
+float quality = 0.4f; // optional parameter, values from 0 to 1 (https://xiph.org/vorbis/doc/vorbisenc/overview.html)
+OggVorbis.VorbisPlugin.Save(pathToFile, audioClip, quality);
+```
+### Get vorbis ogg from bytes array at runtime:
+```
+byte[] sourceAudioBytes = ...;
+UnityEngine.AudioClip sourceAudioClip = OggVorbis.VorbisPlugin.ToAudioClip(sourceAudioBytes, "NameOfAudioClip");
+```
+### Serialize vorbis ogg to bytes array at runtime:
+```
+UnityEngine.AudioClip sourceAudioClip = ...;
+float quality = 0.4f; // optional parameter, values from 0 to 1 (https://xiph.org/vorbis/doc/vorbisenc/overview.html)
+byte[] bytes = OggVorbis.VorbisPlugin.GetOggVorbis(sourceAudioClip, quality);
+```
+
+#### To have more examples you can review the PlayModeTests project, or the PluginTest.cs
+
+# Suported platfoms and options
+#### Supported platforms:
+- Mono, one channel audio
+- Stereo, two channels audio
 
 #### Supported platforms:
 - Windows: x86, x86_64
@@ -23,7 +57,6 @@ You can checkout this repository. The latest released binaries are inside Assets
 4. Run the app
 5. Press "Save Ogg Audio" to store the source Audio clip at runtime to local storage
 6. Press "Load Ogg Audio" to load stored in local storage ogg audio file
-
 
 ## Build libraries for missing platforms:
 In case you need some specific platform for the plugin, you can build the libraries yourself.
