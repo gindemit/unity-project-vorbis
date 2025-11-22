@@ -1,3 +1,8 @@
+# Public archive
+## Use https://github.com/gindemit/unity-vorbis repository
+The https://github.com/gindemit/unity-vorbis contains both: the native library implementation and the Unity project with the native libraries build.
+
+
 # Unity project Vorbis
 This is a Unity sample project that uses the [VorbisPlugin](https://github.com/khindemit/unity-vorbis) to save and load audio data in Vorbis format.
 You can checkout this repository. The latest released binaries are inside Assets/VorbisPlugin/Plugins/ folder
